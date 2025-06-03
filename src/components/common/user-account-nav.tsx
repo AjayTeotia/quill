@@ -1,0 +1,108 @@
+import Image from "next/image";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button, buttonVariants } from "../ui/button";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Icons } from "./icons";
+import Link from "next/link";
+import { GemIcon } from "lucide-react";
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/server";
+
+interface UserAccountNavProps {
+    name: string;
+    email: string | undefined;
+    imageUrl: string;
+}
+
+export const UserAccountNav = async ({
+    name,
+    email,
+    imageUrl,
+}: UserAccountNavProps) => {
+    // TODO: Replace with actual user data fetching logic
+    const subscriptionPlan = false; // Placeholder for subscription plan, replace with actual logic if needed 
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger
+                asChild
+                className="overflow-visible"
+            >
+                <Button className="rounded-full size-8 aspect-square bg-slate-400">
+                    {/* User Avatar */}
+                    <Avatar className="relative size-8">
+                        {imageUrl ? (
+                            <div>
+                                <Image
+                                    fill
+                                    src={imageUrl}
+                                    alt="User Avatar"
+                                    referrerPolicy="no-referrer"
+                                />
+                            </div>
+                        ) : (
+                            <AvatarFallback>
+                                <span className="sr-only">{name}</span>
+                                <Icons.user className="size-4 text-zinc-900" />
+                            </AvatarFallback>
+                        )}
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="bg-white" align="end">
+                <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-0.5 leading-none">
+                        {name && (
+                            <p className="font-medium text-sm text-black">
+                                {name}
+                            </p>
+                        )}
+
+                        {email && (
+                            <p className="w-[200px] truncate text-xs text-zinc-700">
+                                {email}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="w-full">
+                        Dashboard
+                    </Link>
+                </DropdownMenuItem>
+
+                {/* TODO: Replace with actual subscription logic */}
+                <DropdownMenuItem asChild>
+                    {subscriptionPlan ? (
+                        // If the user has a subscription plan, link to manage subscription
+                        <Link href='/dashboard/billing'>
+                            Manage Subscription
+                        </Link>
+                    ) : (
+                        // If the user does not have a subscription plan, link to upgrade
+                        <Link href="/pricing">
+                            Upgrade{" "}
+                            <GemIcon className="text-blue-600 h-4 w-4 ml-1.5" />
+                        </Link>
+                    )}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="cursor-pointer">
+                    <LogoutLink
+                    className={buttonVariants({
+                        variant: "destructive",
+                        size: "sm",
+                        className: "w-full text-left font-semibold",
+                    })}
+                    >
+                        Log out</LogoutLink>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}

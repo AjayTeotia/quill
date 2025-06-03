@@ -4,6 +4,7 @@ import { getKindeServerSession, LoginLink, RegisterLink } from "@kinde-oss/kinde
 import { buttonVariants } from "../ui/button"
 import { ArrowRightIcon } from "lucide-react"
 import { MobileNav } from "./mobile-nav"
+import { UserAccountNav } from "./user-account-nav"
 
 export const Navbar = async () => {
     const { getUser } = await getKindeServerSession()
@@ -59,6 +60,7 @@ export const Navbar = async () => {
                             </>
                         ) : (
                             <>
+                                {/* Dashboard link */}
                                 <Link
                                     href="/dashboard"
                                     className={buttonVariants({
@@ -69,7 +71,16 @@ export const Navbar = async () => {
                                     Dashboard
                                 </Link>
 
-                                {/* TODO: User Account Nav */}
+                                {/* User account nav */}
+                                <UserAccountNav
+                                    name={
+                                        !user.given_name || !user.family_name
+                                            ? "Your Account"
+                                            : `${user.given_name} ${user.family_name}`
+                                    }
+                                    email={user.email ?? ""}
+                                    imageUrl={user.picture ?? ""}
+                                />
                             </>
                         )}
                     </div>
