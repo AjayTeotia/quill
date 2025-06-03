@@ -1,7 +1,8 @@
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { publicProcedure, router } from './trpc';
+import { privateProcedure, publicProcedure, router } from './trpc';
 import { TRPCError } from '@trpc/server';
 import { db } from '@/db';
+import { z } from 'zod';
 
 export const appRouter = router({
     authCallback: publicProcedure.query(async () => {
@@ -30,7 +31,49 @@ export const appRouter = router({
         }
 
         return { success: true }
-    })
+    }),
+
+    getUserFiles: privateProcedure.query(async ({ ctx }) => {
+        const { userId } = ctx
+
+        return await db.file.findMany({
+            where: {
+                userId,
+            },
+            include: {
+                messages: true,
+            },
+        })
+    }),
+
+    deleteFile: privateProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const { userId } = ctx;
+
+            const file = await db.file.findUnique({
+                where: {
+                    id: input.id,
+                    userId,
+                },
+            });
+
+            if (!file) {
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                    message: 'File not found or you do not have permission to delete it.',
+                });
+            }
+
+            // Delete the file and its associated messages
+            await db.file.delete({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            return file;
+        })
 });
 
 // Export type router type signature,
