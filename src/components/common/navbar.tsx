@@ -3,6 +3,7 @@ import { MaxWidthWrapper } from "./max-width-wrapper"
 import { getKindeServerSession, LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server"
 import { buttonVariants } from "../ui/button"
 import { ArrowRightIcon } from "lucide-react"
+import { MobileNav } from "./mobile-nav"
 
 export const Navbar = async () => {
     const { getUser } = await getKindeServerSession()
@@ -19,7 +20,8 @@ export const Navbar = async () => {
                         quill.
                     </Link>
 
-                    {/* TODO: ADD MOBILE NAVBAR */}
+                    {/* Mobile Nav */}
+                    <MobileNav isAuth={!!user} />
 
                     <div className="hidden items-center space-x-4 sm:flex">
                         {!user ? (
