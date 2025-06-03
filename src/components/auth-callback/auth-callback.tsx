@@ -1,4 +1,3 @@
-// app/auth-callback/_components/AuthCallback.tsx
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
