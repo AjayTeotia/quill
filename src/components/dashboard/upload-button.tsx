@@ -88,10 +88,10 @@ const UploadDropzone = () => {
                     return toast.error("Upload failed. Please try again.");
                 }
 
+                toast.success("Upload complete! Redirecting...");
+
                 clearInterval(progressInterval);
                 setUploadProgress(100);
-
-                toast.success("Upload complete! Redirecting...");
 
                 startPolling({ key });
             }}
