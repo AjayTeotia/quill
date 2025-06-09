@@ -2,6 +2,10 @@ import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { pineconeIndex } from "@/lib/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai"
 
 const f = createUploadthing();
 
@@ -30,6 +34,38 @@ export const ourFileRouter = {
             })
 
             console.log("File uploaded successfully:", createdFile);
+
+            try {
+                const response = await fetch(file.url)
+
+                const blob = await response.blob()
+                const loader = new PDFLoader(blob)
+
+                const pageLevelDocs = await loader.load()
+                const pagesAmt = pageLevelDocs.length
+
+                const embeddings = new GoogleGenerativeAIEmbeddings({
+                    apiKey: process.env.GOOGLE_API_KEY!,
+                })
+
+                await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
+                    pineconeIndex,
+                    namespace: createdFile.id,
+                });
+
+                await db.file.update({
+                    where: { id: createdFile.id },
+                    data: { uploadStatus: "SUCCESS" },
+                });
+
+            } catch (error) {
+                console.log(error)
+
+                await db.file.update({
+                    where: { id: createdFile.id },
+                    data: { uploadStatus: "FAILED" },
+                });
+            }
         }),
 } satisfies FileRouter;
 

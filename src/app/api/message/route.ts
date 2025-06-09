@@ -1,7 +1,10 @@
 import { db } from "@/db";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import { PineconeStore } from "@langchain/pinecone";
 import { NextRequest } from "next/server";
+import { pineconeIndex } from "@/lib/pinecone";
 
 export const POST = async (req: NextRequest) => {
     const body = await req.json();
@@ -38,6 +41,31 @@ export const POST = async (req: NextRequest) => {
     })
 
     // 1: vectorize message
-    
+    const embeddings = new GoogleGenerativeAIEmbeddings({
+        apiKey: process.env.GOOGLE_API_KEY!,
+    })
 
+    const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
+        pineconeIndex,
+        namespace: file.id,
+    });
+
+    const results = await vectorStore.similaritySearch(message, 4);
+
+    const prevMessage = await db.message.findMany({
+        where: {
+            fileId,
+        },
+        orderBy: {
+            createdAt: 'asc',
+        },
+        take: 6,
+    })
+
+    const formattedPrevMessages = prevMessage.map((msg) => ({
+        role: msg.isUserMessage
+            ? ("user" as const)
+            : ("assistant" as const),
+        content: msg.text
+    }))
 }
