@@ -23,7 +23,7 @@ export const ChatInput = ({ isDisabled }: { isDisabled?: boolean }) => {
                                     className="absolute bottom-1.5 right-[8px]"
                                     disabled={isDisabled}
                                 >
-                                    <SendIcon className="size-4"/>
+                                    <SendIcon className="size-4" />
                                 </Button>
                             </div>
                         </div>
