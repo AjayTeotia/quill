@@ -50,7 +50,6 @@ export const ChatInput = ({ isDisabled }: { isDisabled?: boolean }) => {
 
                                         textareaRef.current?.focus()
                                     }}
-                                    type="submit"
                                 >
                                     <SendIcon className="size-4" />
                                 </Button>
