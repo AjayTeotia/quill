@@ -45,7 +45,7 @@ export const ourFileRouter = {
                 const pagesAmt = pageLevelDocs.length
 
                 const embeddings = new GoogleGenerativeAIEmbeddings({
-                    apiKey: process.env.GOOGLE_API_KEY!,
+                    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!,
                 })
 
                 await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
