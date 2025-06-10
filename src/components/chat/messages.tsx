@@ -3,10 +3,13 @@ import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query"
 import { Loader2Icon, MessageSquareIcon } from "lucide-react"
 import { Skeleton } from "../ui/skeleton"
 import { Message } from "./message"
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { useIntersection } from "@mantine/hooks"
+import { ChatContext } from "./chat-context"
 
 export const Messages = ({ fileId }: { fileId: string }) => {
+    const { isLoading: isAiThinking } = useContext(ChatContext)
+
     const { data, isLoading, fetchNextPage } = trpc.getFileMessages.useInfiniteQuery({
         fileId,
         limit: INFINITE_QUERY_LIMIT,
@@ -32,7 +35,7 @@ export const Messages = ({ fileId }: { fileId: string }) => {
     }
 
     const combinedMessages = [
-        ...(true ? [loadingMessage] : []),
+        ...(isAiThinking ? [loadingMessage] : []),
         ...(messages ?? []),
     ]
 
