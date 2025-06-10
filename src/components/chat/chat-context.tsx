@@ -109,7 +109,9 @@ export const ChatContextProvider = ({
             setIsLoading(false)
 
             if (!stream) {
-                return toast.error("There was a problem sending this message. Please refresh this page and try again")
+                return toast.error("There was a problem sending this message.", {
+                    description: " Please refresh this page and try again.",
+                })
             }
 
             const reader = stream.getReader()

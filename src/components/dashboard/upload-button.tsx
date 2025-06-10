@@ -79,16 +79,22 @@ const UploadDropzone = () => {
 
                 const res = await startUpload(acceptedFiles);
                 if (!res) {
-                    return toast.error("Upload failed. Please try again.");
+                    return toast.error("Upload failed.", {
+                        description: "Please try again."
+                    });
                 }
 
                 const [fileResponse] = res;
                 const key = fileResponse?.key;
                 if (!key) {
-                    return toast.error("Upload failed. Please try again.");
+                    return toast.error("Upload failed.", {
+                        description: "Please try again."
+                    });
                 }
 
-                toast.success("Upload complete! Redirecting...");
+                toast.success("Upload complete!", {
+                    description: "Your file is being processed.",
+                });
 
                 clearInterval(progressInterval);
                 setUploadProgress(100);

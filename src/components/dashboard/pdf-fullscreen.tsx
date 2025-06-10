@@ -48,7 +48,9 @@ export const PDFFullscreen = ({ fileUrl }: { fileUrl: string }) => {
                                 </div>
                             }
                             onLoadError={() => {
-                                toast.error("Failed to load PDF document. Please try again later.")
+                                toast.error("Failed to load PDF document.", {
+                                    description: "Please try again later."
+                                })
                             }}
                             onLoadSuccess={({ numPages }) =>
                                 setNumPages(numPages)
