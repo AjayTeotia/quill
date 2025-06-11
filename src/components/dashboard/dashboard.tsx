@@ -8,9 +8,13 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { UploadButton } from "./upload-button";
+import { getUserSubscriptionPlan } from "@/lib/stripe";
 
+interface PageProps {
+    subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>
+}
 
-export const Dashboard = () => {
+export const Dashboard = ({ subscriptionPlan }: PageProps) => {
     const [currentlyDeletingFile, setCurrentlyDeletingFile] =
         useState<string | null>(null)
 
@@ -38,7 +42,7 @@ export const Dashboard = () => {
                 </h1>
 
                 {/* Upload Button */}
-                <UploadButton />
+                <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
             </div>
 
             {/* DISPLAY ALL USER FILES */}

@@ -11,37 +11,16 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 
-export const UploadButton = () => {
-    const [isOpen, setIsOpen] = useState<boolean>(false)
 
-    return (
-        <Dialog
-            open={isOpen}
-            onOpenChange={(v) => {
-                setIsOpen(v);
-            }}
-        >
-            <DialogTrigger
-                onClick={() => setIsOpen(true)}
-                asChild
-            >
-                <Button>Upload PDF</Button>
-            </DialogTrigger>
-
-            <DialogContent>
-                <UploadDropzone />
-            </DialogContent>
-        </Dialog>
-    )
-}
-
-const UploadDropzone = () => {
+const UploadDropzone = ({ isSubscribed }: { isSubscribed: boolean }) => {
     const router = useRouter()
 
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [uploadProgress, setUploadProgress] = useState<number>(0)
 
-    const { startUpload } = useUploadThing("pdfUploader")
+    const { startUpload } = useUploadThing(
+        isSubscribed ? "proPlanUploader" : "freePlanUploader",
+    )
 
     const { mutate: startPolling } = trpc.getFile.useMutation({
         onSuccess: (file) => {
@@ -123,7 +102,7 @@ const UploadDropzone = () => {
                                 </p>
 
                                 <p className="text-xs text-zinc-500">
-                                    PDF (up to 4 MB)
+                                    PDF (up to {isSubscribed ? "16" : "4"}MB)
                                 </p>
                             </div>
 
@@ -166,5 +145,29 @@ const UploadDropzone = () => {
                 </div>
             )}
         </Dropzone>
+    )
+}
+
+export const UploadButton = ({ isSubscribed }: { isSubscribed: boolean }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+
+    return (
+        <Dialog
+            open={isOpen}
+            onOpenChange={(v) => {
+                setIsOpen(v);
+            }}
+        >
+            <DialogTrigger
+                onClick={() => setIsOpen(true)}
+                asChild
+            >
+                <Button>Upload PDF</Button>
+            </DialogTrigger>
+
+            <DialogContent>
+                <UploadDropzone isSubscribed={isSubscribed} />
+            </DialogContent>
+        </Dialog>
     )
 }
