@@ -1,11 +1,12 @@
-import Image from "next/image";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Button, buttonVariants } from "../ui/button";
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import { Icons } from "./icons";
-import Link from "next/link";
-import { GemIcon } from "lucide-react";
+import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/server";
+import { GemIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Button, buttonVariants } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Icons } from "./icons";
 
 interface UserAccountNavProps {
     name: string;
@@ -18,8 +19,7 @@ export const UserAccountNav = async ({
     email,
     imageUrl,
 }: UserAccountNavProps) => {
-    // TODO: Replace with actual user data fetching logic
-    const subscriptionPlan = false; // Placeholder for subscription plan, replace with actual logic if needed 
+    const subscriptionPlan = await getUserSubscriptionPlan()
 
     return (
         <DropdownMenu>
@@ -76,7 +76,7 @@ export const UserAccountNav = async ({
 
                 {/* TODO: Replace with actual subscription logic */}
                 <DropdownMenuItem asChild>
-                    {subscriptionPlan ? (
+                    {subscriptionPlan?.isSubscribed ? (
                         // If the user has a subscription plan, link to manage subscription
                         <Link href='/dashboard/billing'>
                             Manage Subscription
@@ -94,11 +94,11 @@ export const UserAccountNav = async ({
 
                 <DropdownMenuItem className="cursor-pointer">
                     <LogoutLink
-                    className={buttonVariants({
-                        variant: "destructive",
-                        size: "sm",
-                        className: "w-full text-left font-semibold",
-                    })}
+                        className={buttonVariants({
+                            variant: "destructive",
+                            size: "sm",
+                            className: "w-full text-left font-semibold",
+                        })}
                     >
                         Log out</LogoutLink>
                 </DropdownMenuItem>
