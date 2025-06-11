@@ -16,26 +16,45 @@ export const appRouter = router({
         if (!user || !user.email)
             throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not authenticated' });
 
-        // Check if user exists in database, if not create a new user
-        const dbUser = await db.user.findUnique({
+        // Check if user exists in database
+        let dbUser = await db.user.findUnique({
             where: {
                 id: user.id,
             }
-        })
+        });
 
-        // if user does not exist, create a new user
+        // If user does not exist, create one and send Ping Panda event
         if (!dbUser) {
-            // create a new user
-            await db.user.create({
+            dbUser = await db.user.create({
                 data: {
                     id: user.id,
                     email: user.email,
                 },
-            })
+            });
+
+            // Send event to Ping Panda
+            await fetch('https://pingpanda-aj.vercel.app/api/v1/events', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer cm4frib3u0001144zbuk0fyqh',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    category: 'quill_users',
+                    fields: {
+                        userId: user.id,
+                        userEmail: user.email,
+                        userName: user.given_name || "Unknown",
+                    },
+                }),
+            }).catch((err) => {
+                console.error("Ping Panda event failed:", err);
+            });
         }
 
-        return { success: true }
+        return { success: true };
     }),
+
 
     getUserFiles: privateProcedure.query(async ({ ctx }) => {
         const { userId } = ctx
